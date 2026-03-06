@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+.cache_sns/
+*.pyc
+
+sns_structure_top20.csv
+sns_narrative_top15.csv
+sns_result_*.xlsx
+
+* 2.csv
+* 2.py

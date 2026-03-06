@@ -1,0 +1,4 @@
+akshare
+numpy
+openpyxl
+pandas

@@ -17,6 +17,9 @@ except ModuleNotFoundError:
     sys.exit(1)
 
 
+MIN_HIST_SAMPLES = 90
+
+
 # ---------- utils ----------
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -260,7 +263,7 @@ def get_hist(code, start_date, end_date, cache_dir=None):
 
 # ---------- feature engineering ----------
 def calc_features(hist: pd.DataFrame):
-    if len(hist) < 120:
+    if len(hist) < MIN_HIST_SAMPLES:
         return None
     close = hist["close"].astype(float).values
 
@@ -356,7 +359,7 @@ def main():
     args = parser.parse_args()
 
     end = datetime.today()
-    start = end - timedelta(days=260)  # 覆盖 120 交易日+缓冲
+    start = end - timedelta(days=520)  # 覆盖 120 交易日+更充足缓冲
     start_date = start.strftime("%Y%m%d")
     end_date = end.strftime("%Y%m%d")
 
@@ -409,6 +412,8 @@ def main():
 
     rows = []
     errors = 0
+    hist_success_count = 0
+    hist_short_count = 0
     total_batches = (len(codes) + args.batch_size - 1) // args.batch_size
     with ThreadPoolExecutor(max_workers=args.max_workers) as ex:
         for batch_idx, i in enumerate(range(0, len(codes), args.batch_size)):
@@ -419,10 +424,14 @@ def main():
                 c = futs[fut]
                 try:
                     hist = fut.result()
+                    if len(hist) < MIN_HIST_SAMPLES:
+                        hist_short_count += 1
+                        continue
                     feats = calc_features(hist)
                     if feats is None:
                         continue
                     rows.append({"code": c, **feats})
+                    hist_success_count += 1
                 except Exception:
                     errors += 1
                     batch_errors += 1
@@ -432,7 +441,10 @@ def main():
 
     feat_df = pd.DataFrame(rows)
     if feat_df.empty:
-        print(f"No features computed. errors={errors}")
+        print(
+            f"No features computed. codes={len(codes)}, "
+            f"short_count={hist_short_count}, errors={errors}"
+        )
         return
 
     df = spot.merge(feat_df, on="code", how="inner")
@@ -467,7 +479,10 @@ def main():
 
     print("Saved: sns_structure_top20.csv, sns_narrative_top15.csv")
     print(f"Saved: {excel_name}")
-    print(f"codes={len(codes)}, features={len(feat_df)}, final={len(df)}, errors={errors}")
+    print(
+        f"codes={len(codes)}, features={len(feat_df)}, final={len(df)}, errors={errors}, "
+        f"hist_success_count={hist_success_count}, hist_short_count={hist_short_count}"
+    )
 
 
 if __name__ == "__main__":

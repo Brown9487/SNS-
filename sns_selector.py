@@ -171,6 +171,7 @@ def get_spot(cache_dir=None):
 
 def get_hist(code, start_date, end_date, cache_dir=None):
     code = str(code).zfill(6)
+    target_end = pd.to_datetime(end_date, format="%Y%m%d", errors="coerce")
     # adjust 可改：qfq/hfq/None
     hist_cache = cache_path(cache_dir, "hist", code) if cache_dir else None
     if hist_cache and os.path.exists(hist_cache):
@@ -182,7 +183,14 @@ def get_hist(code, start_date, end_date, cache_dir=None):
                 dtype={"close": "float64", "volume": "float64", "amount": "float64"},
             )
             cached = cached.dropna(subset=["date", "close", "amount"]).sort_values("date")
-            if len(cached) >= 120:
+            last_cached_date = cached["date"].max() if not cached.empty else pd.NaT
+            # Allow a small gap for weekends/holidays; otherwise refresh stale caches.
+            cache_fresh_enough = (
+                pd.notna(target_end)
+                and pd.notna(last_cached_date)
+                and last_cached_date >= target_end - pd.Timedelta(days=5)
+            )
+            if len(cached) >= 120 and cache_fresh_enough:
                 return cached
         except Exception:
             pass

@@ -18,6 +18,7 @@ except ModuleNotFoundError:
 
 
 MIN_HIST_SAMPLES = 90
+HIST_FETCH_TIMEOUT = 15
 
 
 # ---------- utils ----------
@@ -200,13 +201,15 @@ def get_hist(code, start_date, end_date, cache_dir=None):
     prefixed = to_prefixed_code(code)
     fetchers = [
         (
-            "daily",
+            "hist_em",
             lambda: with_retry(
-                ak.stock_zh_a_daily,
-                symbol=prefixed,
+                ak.stock_zh_a_hist,
+                symbol=code,
+                period="daily",
                 start_date=start_date,
                 end_date=end_date,
                 adjust="qfq",
+                timeout=HIST_FETCH_TIMEOUT,
                 retries=3,
                 base_sleep=0.4,
             ),
@@ -219,23 +222,26 @@ def get_hist(code, start_date, end_date, cache_dir=None):
                 start_date=start_date,
                 end_date=end_date,
                 adjust="qfq",
+                timeout=HIST_FETCH_TIMEOUT,
                 retries=3,
                 base_sleep=0.4,
             ),
         ),
-        (
-            "hist_em",
-            lambda: with_retry(
-                ak.stock_zh_a_hist,
-                symbol=code,
-                period="daily",
-                start_date=start_date,
-                end_date=end_date,
-                adjust="qfq",
-                retries=3,
-                base_sleep=0.4,
-            ),
-        ),
+        # ak.stock_zh_a_daily 内部 requests.get 没有 timeout，且依赖 mini_racer；
+        # 在 macOS + Python 3.12 下更容易出现单只股票长时间卡死，故放到最后并默认禁用。
+        # 如需启用可改为通过显式参数控制。
+        # (
+        #     "daily",
+        #     lambda: with_retry(
+        #         ak.stock_zh_a_daily,
+        #         symbol=prefixed,
+        #         start_date=start_date,
+        #         end_date=end_date,
+        #         adjust="qfq",
+        #         retries=3,
+        #         base_sleep=0.4,
+        #     ),
+        # ),
     ]
     for _, fetch in fetchers:
         try:
@@ -491,7 +497,6 @@ def main():
         f"codes={len(codes)}, features={len(feat_df)}, final={len(df)}, errors={errors}, "
         f"hist_success_count={hist_success_count}, hist_short_count={hist_short_count}"
     )
-
 
 if __name__ == "__main__":
     main()

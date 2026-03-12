@@ -19,6 +19,7 @@ except ModuleNotFoundError:
 
 MIN_HIST_SAMPLES = 90
 HIST_FETCH_TIMEOUT = 15
+CACHE_FRESH_SLACK_DAYS = 3
 
 
 # ---------- utils ----------
@@ -185,11 +186,11 @@ def get_hist(code, start_date, end_date, cache_dir=None):
             )
             cached = cached.dropna(subset=["date", "close", "amount"]).sort_values("date")
             last_cached_date = cached["date"].max() if not cached.empty else pd.NaT
-            # Allow a small gap for weekends/holidays; otherwise refresh stale caches.
+            # Allow only a weekend-sized gap; otherwise refresh stale caches.
             cache_fresh_enough = (
                 pd.notna(target_end)
                 and pd.notna(last_cached_date)
-                and last_cached_date >= target_end - pd.Timedelta(days=5)
+                and last_cached_date >= target_end - pd.Timedelta(days=CACHE_FRESH_SLACK_DAYS)
             )
             if len(cached) >= 120 and cache_fresh_enough:
                 return cached
@@ -432,6 +433,7 @@ def main():
     with ThreadPoolExecutor(max_workers=args.max_workers) as ex:
         for batch_idx, i in enumerate(range(0, len(codes), args.batch_size)):
             batch = codes[i : i + args.batch_size]
+            print(f"Processing batch {batch_idx + 1}/{total_batches}, size={len(batch)}")
             futs = {ex.submit(get_hist, c, start_date, end_date, args.cache_dir): c for c in batch}
             batch_errors = 0
             for fut in as_completed(futs):
@@ -449,6 +451,10 @@ def main():
                 except Exception:
                     errors += 1
                     batch_errors += 1
+            print(
+                f"Finished batch {batch_idx + 1}/{total_batches}: "
+                f"batch_errors={batch_errors}, total_features={len(rows)}"
+            )
             # 仅在中间批次且当前批次有错误时等待，减少全量运行固定等待开销
             if batch_idx < total_batches - 1 and batch_errors > 0:
                 time.sleep(random.uniform(args.sleep_min, args.sleep_max))

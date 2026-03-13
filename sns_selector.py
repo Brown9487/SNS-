@@ -20,6 +20,7 @@ except ModuleNotFoundError:
 MIN_HIST_SAMPLES = 90
 HIST_FETCH_TIMEOUT = 15
 CACHE_FRESH_SLACK_DAYS = 3
+EMA_CROSS_LOOKBACK_DAYS = 10
 
 
 # ---------- utils ----------
@@ -281,6 +282,7 @@ def calc_features(hist: pd.DataFrame):
     if len(hist) < MIN_HIST_SAMPLES:
         return None
     close = hist["close"].astype(float).values
+    close_s = pd.Series(close)
 
     # rolling returns
     def r(period):
@@ -314,6 +316,32 @@ def calc_features(hist: pd.DataFrame):
     else:
         spike = np.nan
 
+    # turning-point proxy: recent 12EMA up-cross 50EMA with recent amount confirmation
+    ema_12 = close_s.ewm(span=12, adjust=False).mean().to_numpy()
+    ema_50 = close_s.ewm(span=50, adjust=False).mean().to_numpy()
+    ema_diff = ema_12 - ema_50
+    cross_up = (ema_diff[1:] > 0) & (ema_diff[:-1] <= 0)
+    cross_idx = np.where(cross_up)[0] + 1
+
+    ema_cross_recent = 0.0
+    ema_cross_days = np.nan
+    ema_cross_amt_confirm = np.nan
+    pivot_ema_vol = 0.0
+
+    if len(amt) >= 25:
+        ema_cross_amt_confirm = (amt[-5:].mean() / (amt[-25:-5].mean() + 1e-9)) - 1
+
+    if len(cross_idx) > 0:
+        last_cross_idx = int(cross_idx[-1])
+        days_since_cross = len(close) - 1 - last_cross_idx
+        ema_cross_days = float(days_since_cross)
+        if days_since_cross <= EMA_CROSS_LOOKBACK_DAYS and ema_diff[-1] > 0:
+            ema_cross_recent = 1.0
+            freshness = max(0.0, 1.0 - days_since_cross / EMA_CROSS_LOOKBACK_DAYS)
+            ema_spread = max(0.0, ema_12[-1] / (ema_50[-1] + 1e-9) - 1)
+            vol_confirm = max(0.0, ema_cross_amt_confirm) if pd.notna(ema_cross_amt_confirm) else 0.0
+            pivot_ema_vol = freshness + 0.6 * min(vol_confirm, 1.5) + 0.4 * min(ema_spread * 100, 1.5)
+
     return {
         "ret_120": mom_120,
         "mom_20": mom_20,
@@ -323,6 +351,10 @@ def calc_features(hist: pd.DataFrame):
         "breakout_120": breakout,
         "amt_spike": spike,
         "avg_amt_20": avg_amt_20,
+        "ema_cross_12_50_recent": ema_cross_recent,
+        "ema_cross_days": ema_cross_days,
+        "ema_cross_amt_confirm": ema_cross_amt_confirm,
+        "pivot_ema_vol": pivot_ema_vol,
         "latest_date": hist["date"].max(),
     }
 
@@ -337,13 +369,14 @@ def build_scores(df: pd.DataFrame):
     z_m60 = zscore(df["mom_60"])
     z_spk = zscore(df["amt_spike"])
     z_brk = zscore(df["breakout_120"])
+    z_pivot = zscore(df["pivot_ema_vol"])
 
     # 结构代理：收益/回撤 + 相对强弱 + 稳定性（dd）
     # dd 越接近 0 越好，所以用 -z_dd（因为 dd 更负更差）
     score_structure_proxy = 0.45 * z_ret + 0.35 * z_rs + 0.20 * (-z_dd)
 
-    # 叙事代理：短中动量 + 成交放大 + 逼近/突破新高
-    score_narrative_proxy = 0.35 * z_m20 + 0.25 * z_m60 + 0.25 * z_spk + 0.15 * z_brk
+    # 叙事代理：短中动量 + 成交放大 + 逼近/突破新高 + EMA金叉拐点
+    score_narrative_proxy = 0.30 * z_m20 + 0.20 * z_m60 + 0.20 * z_spk + 0.15 * z_brk + 0.15 * z_pivot
 
     r_value = sigmoid(1.2 * score_structure_proxy - 1.0 * score_narrative_proxy)
 

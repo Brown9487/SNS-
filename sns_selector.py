@@ -405,6 +405,9 @@ def main():
         help="指数代码列表, 逗号分隔; 默认中证A500+沪深300+中证红利+中证1000",
     )
     args = parser.parse_args()
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    if not os.path.isabs(args.cache_dir):
+        args.cache_dir = os.path.join(script_dir, args.cache_dir)
 
     end = datetime.today()
     start = end - timedelta(days=520)  # 覆盖 120 交易日+更充足缓冲
@@ -520,18 +523,22 @@ def main():
     structure_pool = df[df["R"] >= 0.6].sort_values(["S_score", "R"], ascending=False).head(20)
     narrative_pool = df[df["R"] <= 0.4].sort_values(["N_score"], ascending=False).head(15)
 
-    structure_pool.to_csv("sns_structure_top20.csv", index=False, encoding="utf-8-sig")
-    narrative_pool.to_csv("sns_narrative_top15.csv", index=False, encoding="utf-8-sig")
+    structure_csv = os.path.join(script_dir, "sns_structure_top20.csv")
+    narrative_csv = os.path.join(script_dir, "sns_narrative_top15.csv")
+    structure_pool.to_csv(structure_csv, index=False, encoding="utf-8-sig")
+    narrative_pool.to_csv(narrative_csv, index=False, encoding="utf-8-sig")
     run_date_str = datetime.today().strftime("%Y%m%d")
     latest_data_date = pd.to_datetime(df["latest_date"], errors="coerce").max()
     latest_data_date_str = latest_data_date.strftime("%Y%m%d") if pd.notna(latest_data_date) else "unknown"
     excel_name = f"sns_result_{run_date_str}_data_{latest_data_date_str}.xlsx"
-    with pd.ExcelWriter(excel_name, engine="openpyxl") as writer:
+    excel_path = os.path.join(script_dir, excel_name)
+    with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
         structure_pool.to_excel(writer, sheet_name="structure", index=False)
         narrative_pool.to_excel(writer, sheet_name="narrative", index=False)
 
-    print("Saved: sns_structure_top20.csv, sns_narrative_top15.csv")
-    print(f"Saved: {excel_name}")
+    print(f"Saved: {structure_csv}")
+    print(f"Saved: {narrative_csv}")
+    print(f"Saved: {excel_path}")
     print(
         f"codes={len(codes)}, features={len(feat_df)}, final={len(df)}, errors={errors}, "
         f"hist_success_count={hist_success_count}, hist_short_count={hist_short_count}"

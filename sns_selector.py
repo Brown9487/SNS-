@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 
 MIN_HIST_SAMPLES = 90
 HIST_FETCH_TIMEOUT = 15
-CACHE_FRESH_SLACK_DAYS = 3
+CACHE_FRESH_SLACK_DAYS = 1
 EMA_CROSS_LOOKBACK_DAYS = 10
 
 
@@ -64,6 +64,34 @@ def cache_path(cache_dir, kind, key):
     return os.path.join(cache_dir, f"{kind}_{safe_key}.csv")
 
 
+def load_latest_cache_csv(cache_dir, kind, max_age_days=None, **read_csv_kwargs):
+    if not cache_dir or not os.path.isdir(cache_dir):
+        return None
+    prefix = f"{kind}_"
+    candidates = sorted(
+        os.path.join(cache_dir, f)
+        for f in os.listdir(cache_dir)
+        if f.startswith(prefix) and f.endswith(".csv")
+    )
+    if not candidates:
+        return None
+
+    latest = candidates[-1]
+    if max_age_days is not None:
+        basename = os.path.basename(latest)
+        date_part = basename[len(prefix):-4]
+        cache_date = pd.to_datetime(date_part, format="%Y%m%d", errors="coerce")
+        if pd.isna(cache_date):
+            return None
+        if cache_date < pd.Timestamp(datetime.today().date()) - pd.Timedelta(days=max_age_days):
+            return None
+
+    try:
+        return pd.read_csv(latest, **read_csv_kwargs)
+    except Exception:
+        return None
+
+
 def normalize_code_series(s: pd.Series) -> pd.Series:
     return s.astype(str).str.extract(r"(\d{6})", expand=False)
 
@@ -88,6 +116,13 @@ def normalize_spot_df(spot: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_index_constituents(index_symbols, cache_dir=None):
+    cached_pool = load_latest_cache_csv(cache_dir, "pool", max_age_days=CACHE_FRESH_SLACK_DAYS, dtype={"code": str})
+    if cached_pool is not None and "code" in cached_pool.columns:
+        cached_pool["code"] = normalize_code_series(cached_pool["code"]).str.zfill(6)
+        cached_pool = cached_pool.dropna(subset=["code"]).drop_duplicates(subset=["code"]).reset_index(drop=True)
+        if not cached_pool.empty:
+            return cached_pool
+
     frames = []
     for symbol in index_symbols:
         try:
@@ -121,6 +156,12 @@ def get_index_constituents(index_symbols, cache_dir=None):
 
 # ---------- data fetch ----------
 def get_spot(cache_dir=None):
+    cached_spot = load_latest_cache_csv(cache_dir, "spot", max_age_days=CACHE_FRESH_SLACK_DAYS, dtype={"code": str})
+    if cached_spot is not None:
+        cached_spot = normalize_spot_df(cached_spot)
+        if not cached_spot.empty:
+            return cached_spot
+
     spot = None
     last_err = None
     for fetcher, retries in [(ak.stock_zh_a_spot_em, 4), (ak.stock_zh_a_spot, 3)]:
@@ -408,6 +449,7 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(args.cache_dir):
         args.cache_dir = os.path.join(script_dir, args.cache_dir)
+    run_started_at = time.perf_counter()
 
     end = datetime.today()
     start = end - timedelta(days=520)  # 覆盖 120 交易日+更充足缓冲
@@ -415,10 +457,15 @@ def main():
     end_date = end.strftime("%Y%m%d")
 
     index_symbols = [x.strip() for x in args.index_symbols.split(",") if x.strip()]
+    stage_started_at = time.perf_counter()
     pool = get_index_constituents(index_symbols=index_symbols, cache_dir=args.cache_dir)
-    print(f"Universe from indexes={index_symbols}, unique codes={len(pool)}")
+    print(
+        f"Universe from indexes={index_symbols}, unique codes={len(pool)}, "
+        f"pool_fetch_sec={time.perf_counter() - stage_started_at:.2f}"
+    )
 
     spot = None
+    stage_started_at = time.perf_counter()
     try:
         spot = get_spot(cache_dir=args.cache_dir)
     except Exception as e:
@@ -437,6 +484,7 @@ def main():
         else:
             print(f"Warning: get_spot failed and no cache; use index pool only. err={type(e).__name__}")
             spot = None
+    print(f"Spot load sec={time.perf_counter() - stage_started_at:.2f}")
 
     # 基础过滤 + 指数股票池约束
     if spot is None:
@@ -466,6 +514,7 @@ def main():
     hist_success_count = 0
     hist_short_count = 0
     total_batches = (len(codes) + args.batch_size - 1) // args.batch_size
+    stage_started_at = time.perf_counter()
     with ThreadPoolExecutor(max_workers=args.max_workers) as ex:
         for batch_idx, i in enumerate(range(0, len(codes), args.batch_size)):
             batch = codes[i : i + args.batch_size]
@@ -494,6 +543,7 @@ def main():
             # 仅在中间批次且当前批次有错误时等待，减少全量运行固定等待开销
             if batch_idx < total_batches - 1 and batch_errors > 0:
                 time.sleep(random.uniform(args.sleep_min, args.sleep_max))
+    hist_stage_sec = time.perf_counter() - stage_started_at
 
     feat_df = pd.DataFrame(rows)
     if feat_df.empty:
@@ -520,6 +570,7 @@ def main():
     df = build_scores(df)
 
     # 分流输出
+    stage_started_at = time.perf_counter()
     structure_pool = df[df["R"] >= 0.6].sort_values(["S_score", "R"], ascending=False).head(20)
     narrative_pool = df[df["R"] <= 0.4].sort_values(["N_score"], ascending=False).head(15)
 
@@ -542,6 +593,11 @@ def main():
     print(
         f"codes={len(codes)}, features={len(feat_df)}, final={len(df)}, errors={errors}, "
         f"hist_success_count={hist_success_count}, hist_short_count={hist_short_count}"
+    )
+    print(
+        f"timing_sec: hist_and_features={hist_stage_sec:.2f}, "
+        f"score_and_output={time.perf_counter() - stage_started_at:.2f}, "
+        f"total={time.perf_counter() - run_started_at:.2f}"
     )
 
 if __name__ == "__main__":

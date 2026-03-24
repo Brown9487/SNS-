@@ -1,11 +1,8 @@
-.DS_Store
+.venv/
 __pycache__/
 .cache_sns/
-*.pyc
-
+.DS_Store
+*.log
 sns_structure_top20.csv
 sns_narrative_top15.csv
 sns_result_*.xlsx
-
-* 2.csv
-* 2.py

@@ -42,6 +42,17 @@ def zscore(s):
     return (s - s.mean()) / (s.std(ddof=0) + 1e-9)
 
 
+def clipped_log_pe(s: pd.Series, lower_q=0.05, upper_q=0.95) -> pd.Series:
+    pe = pd.to_numeric(s, errors="coerce")
+    pe = pe.where(pe > 0)
+    if pe.notna().sum() < 5:
+        return pd.Series(np.nan, index=s.index)
+    lower = pe.quantile(lower_q)
+    upper = pe.quantile(upper_q)
+    pe = pe.clip(lower=lower, upper=upper)
+    return np.log(pe)
+
+
 def with_retry(func, *args, retries=4, base_sleep=0.8, **kwargs):
     last_err = None
     for i in range(retries):
@@ -411,10 +422,12 @@ def build_scores(df: pd.DataFrame):
     z_spk = zscore(df["amt_spike"])
     z_brk = zscore(df["breakout_120"])
     z_pivot = zscore(df["pivot_ema_vol"])
+    z_log_pe = zscore(clipped_log_pe(df["pe"])) if "pe" in df.columns else pd.Series(np.nan, index=df.index)
+    pe_overlay = (-z_log_pe).fillna(-0.15)
 
     # 结构代理：收益/回撤 + 相对强弱 + 稳定性（dd）
     # dd 越接近 0 越好，所以用 -z_dd（因为 dd 更负更差）
-    score_structure_proxy = 0.45 * z_ret + 0.35 * z_rs + 0.20 * (-z_dd)
+    score_structure_proxy = 0.40 * z_ret + 0.30 * z_rs + 0.15 * (-z_dd) + 0.15 * pe_overlay
 
     # 叙事代理：短中动量 + 成交放大 + 逼近/突破新高 + EMA金叉拐点
     score_narrative_proxy = 0.30 * z_m20 + 0.20 * z_m60 + 0.20 * z_spk + 0.15 * z_brk + 0.15 * z_pivot
@@ -428,6 +441,7 @@ def build_scores(df: pd.DataFrame):
     df["R"] = r_value
     df["S_score"] = s_score.clip(0, 100)
     df["N_score"] = n_score.clip(0, 100)
+    df["PE_score"] = (50 + 15 * pe_overlay).clip(0, 100)
     return df
 
 
@@ -442,8 +456,8 @@ def main():
     parser.add_argument(
         "--index-symbols",
         type=str,
-        default="000510,000300,000922,000852",
-        help="指数代码列表, 逗号分隔; 默认中证A500+沪深300+中证红利+中证1000",
+        default="000510,000852",
+        help="指数代码列表, 逗号分隔; 默认中证A500+中证1000",
     )
     args = parser.parse_args()
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -495,10 +509,6 @@ def main():
         spot = spot[~spot["name"].astype(str).str.contains("ST|\\*ST|退", na=False)]
         spot = spot.merge(pool[["code"]], on="code", how="inner")
         spot = spot.dropna(subset=["code"]).reset_index(drop=True)
-        if "mv" in spot.columns and spot["mv"].notna().any():
-            spot = spot[spot["mv"] > 1.5e10]  # 150亿市值阈值
-        else:
-            print("Warning: mv column unavailable, skip mv filter.")
         if "name" in pool.columns:
             spot = spot.merge(pool[["code", "name", "index_name", "index_code"]], on="code", how="left", suffixes=("", "_pool"))
             spot["name"] = spot["name"].fillna(spot.get("name_pool"))

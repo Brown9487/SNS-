@@ -7,6 +7,7 @@ import os
 import argparse
 import random
 import sys
+import traceback
 
 try:
     import akshare as ak
@@ -21,6 +22,8 @@ MIN_HIST_SAMPLES = 90
 HIST_FETCH_TIMEOUT = 15
 CACHE_FRESH_SLACK_DAYS = 1
 EMA_CROSS_LOOKBACK_DAYS = 10
+MAX_ERROR_LOGS = 20
+RETRY_FAILED_PASSES = 2
 
 
 # ---------- utils ----------
@@ -68,6 +71,19 @@ def with_retry(func, *args, retries=4, base_sleep=0.8, **kwargs):
 
 def ensure_dir(path):
     os.makedirs(path, exist_ok=True)
+
+
+def disable_progress_bars():
+    # Best-effort: many upstream fetchers honor these env vars through tqdm.
+    os.environ.setdefault("TQDM_DISABLE", "1")
+    os.environ.setdefault("DISABLE_TQDM", "1")
+    os.environ.setdefault("AKSHARE_DISABLE_TQDM", "1")
+    try:
+        import akshare.stock_feature.stock_hist_tx as stock_hist_tx_mod
+
+        stock_hist_tx_mod.get_tqdm = lambda enable=True: (lambda iterable, *args, **kwargs: iterable)
+    except Exception:
+        pass
 
 
 def cache_path(cache_dir, kind, key):
@@ -224,7 +240,7 @@ def get_spot(cache_dir=None):
     return spot
 
 
-def get_hist(code, start_date, end_date, cache_dir=None):
+def get_hist(code, start_date, end_date, cache_dir=None, enable_tx_fallback=True):
     code = str(code).zfill(6)
     target_end = pd.to_datetime(end_date, format="%Y%m%d", errors="coerce")
     # adjust 可改：qfq/hfq/None
@@ -268,35 +284,23 @@ def get_hist(code, start_date, end_date, cache_dir=None):
                 base_sleep=0.4,
             ),
         ),
-        (
-            "hist_tx",
-            lambda: with_retry(
-                ak.stock_zh_a_hist_tx,
-                symbol=prefixed,
-                start_date=start_date,
-                end_date=end_date,
-                adjust="qfq",
-                timeout=HIST_FETCH_TIMEOUT,
-                retries=3,
-                base_sleep=0.4,
-            ),
-        ),
-        # ak.stock_zh_a_daily 内部 requests.get 没有 timeout，且依赖 mini_racer；
-        # 在 macOS + Python 3.12 下更容易出现单只股票长时间卡死，故放到最后并默认禁用。
-        # 如需启用可改为通过显式参数控制。
-        # (
-        #     "daily",
-        #     lambda: with_retry(
-        #         ak.stock_zh_a_daily,
-        #         symbol=prefixed,
-        #         start_date=start_date,
-        #         end_date=end_date,
-        #         adjust="qfq",
-        #         retries=3,
-        #         base_sleep=0.4,
-        #     ),
-        # ),
     ]
+    if enable_tx_fallback:
+        fetchers.append(
+            (
+                "hist_tx",
+                lambda: with_retry(
+                    ak.stock_zh_a_hist_tx,
+                    symbol=prefixed,
+                    start_date=start_date,
+                    end_date=end_date,
+                    adjust="qfq",
+                    timeout=HIST_FETCH_TIMEOUT,
+                    retries=3,
+                    base_sleep=0.4,
+                ),
+            )
+        )
     for _, fetch in fetchers:
         try:
             df = fetch()
@@ -411,6 +415,16 @@ def calc_features(hist: pd.DataFrame):
     }
 
 
+def append_feature_row(rows, code, hist):
+    if len(hist) < MIN_HIST_SAMPLES:
+        return False, "short"
+    feats = calc_features(hist)
+    if feats is None:
+        return False, "short"
+    rows.append({"code": code, **feats})
+    return True, "ok"
+
+
 # ---------- scoring ----------
 def build_scores(df: pd.DataFrame):
     # 标准化
@@ -447,12 +461,13 @@ def build_scores(df: pd.DataFrame):
 
 def main():
     parser = argparse.ArgumentParser(description="SNS 选股脚本")
-    parser.add_argument("--max-workers", type=int, default=8, help="并发抓取线程数")
+    parser.add_argument("--max-workers", type=int, default=4, help="并发抓取线程数")
     parser.add_argument("--batch-size", type=int, default=80, help="分批抓取大小")
     parser.add_argument("--sleep-min", type=float, default=0.3, help="批次间最小等待秒数")
     parser.add_argument("--sleep-max", type=float, default=1.0, help="批次间最大等待秒数")
     parser.add_argument("--cache-dir", type=str, default=".cache_sns", help="缓存目录")
     parser.add_argument("--limit-codes", type=int, default=0, help="仅测试前N只股票, 0表示全量")
+    parser.add_argument("--enable-tx-fallback", action="store_true", help="启用腾讯历史行情回退源")
     parser.add_argument(
         "--index-symbols",
         type=str,
@@ -460,6 +475,7 @@ def main():
         help="指数代码列表, 逗号分隔; 默认中证A500+中证1000",
     )
     args = parser.parse_args()
+    disable_progress_bars()
     script_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(args.cache_dir):
         args.cache_dir = os.path.join(script_dir, args.cache_dir)
@@ -521,39 +537,79 @@ def main():
 
     rows = []
     errors = 0
+    error_logs = 0
     hist_success_count = 0
     hist_short_count = 0
+    failed_codes = []
     total_batches = (len(codes) + args.batch_size - 1) // args.batch_size
     stage_started_at = time.perf_counter()
     with ThreadPoolExecutor(max_workers=args.max_workers) as ex:
         for batch_idx, i in enumerate(range(0, len(codes), args.batch_size)):
             batch = codes[i : i + args.batch_size]
             print(f"Processing batch {batch_idx + 1}/{total_batches}, size={len(batch)}")
-            futs = {ex.submit(get_hist, c, start_date, end_date, args.cache_dir): c for c in batch}
+            futs = {
+                ex.submit(get_hist, c, start_date, end_date, args.cache_dir, args.enable_tx_fallback): c
+                for c in batch
+            }
             batch_errors = 0
             for fut in as_completed(futs):
                 c = futs[fut]
                 try:
                     hist = fut.result()
-                    if len(hist) < MIN_HIST_SAMPLES:
+                    ok, reason = append_feature_row(rows, c, hist)
+                    if not ok:
                         hist_short_count += 1
                         continue
-                    feats = calc_features(hist)
-                    if feats is None:
-                        continue
-                    rows.append({"code": c, **feats})
                     hist_success_count += 1
                 except Exception:
                     errors += 1
                     batch_errors += 1
+                    failed_codes.append(c)
+                    if error_logs < MAX_ERROR_LOGS:
+                        print(f"Error: get_hist failed for code={c}")
+                        print(traceback.format_exc(limit=2).strip())
+                        error_logs += 1
             print(
                 f"Finished batch {batch_idx + 1}/{total_batches}: "
-                f"batch_errors={batch_errors}, total_features={len(rows)}"
+                f"batch_errors={batch_errors}, total_features={len(rows)}, "
+                f"hist_success_count={hist_success_count}, hist_short_count={hist_short_count}"
             )
             # 仅在中间批次且当前批次有错误时等待，减少全量运行固定等待开销
             if batch_idx < total_batches - 1 and batch_errors > 0:
                 time.sleep(random.uniform(args.sleep_min, args.sleep_max))
     hist_stage_sec = time.perf_counter() - stage_started_at
+
+    failed_codes = list(dict.fromkeys(failed_codes))
+    if failed_codes:
+        print(f"Retrying failed codes: count={len(failed_codes)}, passes={RETRY_FAILED_PASSES}")
+    for retry_pass in range(RETRY_FAILED_PASSES):
+        if not failed_codes:
+            break
+        retry_failed_codes = []
+        print(f"Retry pass {retry_pass + 1}/{RETRY_FAILED_PASSES}, pending={len(failed_codes)}")
+        for c in failed_codes:
+            try:
+                hist = get_hist(c, start_date, end_date, args.cache_dir, args.enable_tx_fallback)
+                ok, _ = append_feature_row(rows, c, hist)
+                if ok:
+                    hist_success_count += 1
+                else:
+                    hist_short_count += 1
+            except Exception:
+                errors += 1
+                retry_failed_codes.append(c)
+                if error_logs < MAX_ERROR_LOGS:
+                    print(f"Retry error: get_hist failed for code={c}")
+                    print(traceback.format_exc(limit=2).strip())
+                    error_logs += 1
+            time.sleep(0.05)
+        failed_codes = retry_failed_codes
+
+    print(
+        f"Feature stage summary: codes={len(codes)}, features={len(rows)}, "
+        f"errors={errors}, hist_success_count={hist_success_count}, "
+        f"hist_short_count={hist_short_count}, unresolved_failed_codes={len(failed_codes)}"
+    )
 
     feat_df = pd.DataFrame(rows)
     if feat_df.empty:
@@ -611,4 +667,9 @@ def main():
     )
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        print("Fatal error in main():")
+        print(traceback.format_exc())
+        raise

@@ -1,0 +1,548 @@
+/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Universe from indexes=['000510', '000852'], unique codes=1464, pool_fetch_sec=0.01
+Spot load sec=0.02
+Processing batch 1/19, size=80
+Finished batch 1/19: batch_errors=0, total_features=80, hist_success_count=80, hist_short_count=0
+Processing batch 2/19, size=80
+Finished batch 2/19: batch_errors=0, total_features=160, hist_success_count=160, hist_short_count=0
+Processing batch 3/19, size=80
+Finished batch 3/19: batch_errors=0, total_features=240, hist_success_count=240, hist_short_count=0
+Processing batch 4/19, size=80
+Finished batch 4/19: batch_errors=0, total_features=320, hist_success_count=320, hist_short_count=0
+Processing batch 5/19, size=80
+Finished batch 5/19: batch_errors=0, total_features=400, hist_success_count=400, hist_short_count=0
+Processing batch 6/19, size=80
+Finished batch 6/19: batch_errors=0, total_features=480, hist_success_count=480, hist_short_count=0
+Processing batch 7/19, size=80
+Finished batch 7/19: batch_errors=0, total_features=560, hist_success_count=560, hist_short_count=0
+Processing batch 8/19, size=80
+Finished batch 8/19: batch_errors=0, total_features=640, hist_success_count=640, hist_short_count=0
+Processing batch 9/19, size=80
+Finished batch 9/19: batch_errors=0, total_features=720, hist_success_count=720, hist_short_count=0
+Processing batch 10/19, size=80
+Finished batch 10/19: batch_errors=0, total_features=800, hist_success_count=800, hist_short_count=0
+Processing batch 11/19, size=80
+Error: get_hist failed for code=000927
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000932
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000930
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000938
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000928
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000933
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000923
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000935
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000950
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000960
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000963
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000966
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000967
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000969
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000970
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000975
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000977
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000988
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=000990
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Error: get_hist failed for code=001236
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/Users/liuborang/Library/Python/3.9/lib/python/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_selector.py", line 546, in main
+    hist = fut.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Finished batch 11/19: batch_errors=48, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 12/19, size=80
+Finished batch 12/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 13/19, size=80
+Finished batch 13/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 14/19, size=80
+Finished batch 14/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 15/19, size=80
+Finished batch 15/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 16/19, size=80
+Finished batch 16/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 17/19, size=80
+Finished batch 17/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 18/19, size=80
+Finished batch 18/19: batch_errors=80, total_features=832, hist_success_count=832, hist_short_count=0
+Processing batch 19/19, size=24
+Finished batch 19/19: batch_errors=24, total_features=832, hist_success_count=832, hist_short_count=0
+Feature stage summary: codes=1464, features=832, errors=632, hist_success_count=832, hist_short_count=0
+Saved: /Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_structure_top20.csv
+Saved: /Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_narrative_top15.csv
+Saved: /Users/liuborang/Library/Mobile Documents/com~apple~CloudDocs/codex/SNS选股/sns_result_20260324_data_20260324.xlsx
+codes=1464, features=832, final=33, errors=632, hist_success_count=832, hist_short_count=0
+timing_sec: hist_and_features=161.95, score_and_output=0.68, total=162.69
